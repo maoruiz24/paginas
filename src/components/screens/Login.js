@@ -1,61 +1,125 @@
-import { Box, FormControl, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput } from "@mui/material";
-import { useState } from "react";
-import { useNavigate, useNavigation } from "react-router-dom";
+import { Button, Divider, FormControl, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material';
+import { Box } from '@mui/system';
+import { RouterProvider } from 'react-router-dom';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import GoogleIcon from '@mui/icons-material/Google';
 
-const Login = () => { 
+import { useEffect, useState } from 'react';
+
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
-    const navigation = useNavigate();
+    const [usuario, setUsuario] = useState('');
+    const [password, setPassword] = useState('');
+
+    const schema = yup.object().shape({
+        usuario: yup.string().max(32).required().email(),
+        password: yup.string().max(32).required(),
+    });
+
+    const { control, handleSubmit, formState: { errors } } = useForm({
+        resolver: yupResolver(schema),
+    });
+
+    useEffect(() => {
+        console.log(usuario)
+    },[usuario])
+
+    const onUserHandle = (e) => {
+        setUsuario(e.target.value)
+    }
+
+    const onSave = (data) => {
+        console.log(data)
+    }
+
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
+    return (
 
-    const handleMouseDownPassword = (event) => {
-        event.preventDefault();
-    };
-
-    return(
-        // <div>
-        //     <input type="text" />
-        //     <input type="password" />
-        //     <button onClick={() => {navigation('/dashboard')}}>Log In</button>
-        // </div>
-        <Box sx={{ flex: 1 }}>
-           <Grid container spacing={2} style={{ backgroundColor: "red" }}>
-                <Grid item xs={12} md={6} lg={3} xl={1} style={{ backgroundColor: "orange" }}>
-                    <h2>Logo</h2>
-                </Grid>
-                <Grid item xs={12} md={6} lg={3} xl={1}>
-                    <h2>xs=4</h2>
-                </Grid>
-                <Grid item xs={12} md={6} lg={3} xl={1} style={{ backgroundColor: "green" }}>
-                    <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-                        <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-                        <OutlinedInput
-                            id="outlined-adornment-password"
-                            type={showPassword ? 'text' : 'password'}
-                            endAdornment={
-                            <InputAdornment position="end">
-                                <IconButton
-                                aria-label="toggle password visibility"
-                                onClick={handleClickShowPassword}
-                                onMouseDown={handleMouseDownPassword}
-                                edge="end"
-                                >
-                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                                </IconButton>
-                            </InputAdornment>
-                            }
-                            label="Password"
+        <Grid container direction='column' justifyContent='center' alignItems='center' sx={{ backgroundColor: 'grey', flexGrow: 1, minHeight: '100vh' }}>
+            <Grid item sm={12}>
+                <Grid container md={12} sx={{ backgroundColor: 'white', display: "flex", borderRadius: 3, p: 3 }}  flexDirection="column">
+                    <Grid item sx={{ display: "flex", p: 3 }} flexDirection="column" alignItems="center"  >
+                        <Typography color="secondary" fontSize="1.6rem">
+                            Hi, Welcome Back
+                        </Typography>
+                        <Typography>
+                            Enter your credential to continue
+                        </Typography>
+                        
+                        <Button variant="outlined" startIcon={<GoogleIcon />}  sx={{ width: "100%", mt: 3 }} >
+                            Sign In With Google
+                        </Button>
+                        <Divider sx={{ mt: 3, mb: 3 }}>OR</Divider>
+                        <Typography color="secondary" >
+                            Sign In With Email Address
+                        </Typography>
+                        <Controller render={({ formState, field}) => {
+                            return <TextField {...field} error={!!formState.errors?.usuario}
+                                id="outlined-basic" sx={{ width: "100%", mt: 3 }} label="Email Address/Username" variant="outlined" />
+                        }}
+                        name="usuario"
+                        control={control}
+                        defaultValue=""
                         />
-                    </FormControl>
+                        <Controller render={({ formState, field}) => {
+                            return <TextField {...field} error={!!formState.errors?.password}
+                                id="outlined-basic" sx={{ width: "100%", mt: 3 }} label="Password" variant="outlined" />
+                        }}
+                        name="password"
+                        control={control}
+                        defaultValue=""
+                        />
+                        {/* <FormControl sx={{ m: 1, width: '100%' }} variant="outlined">
+                            <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                            <OutlinedInput
+                                id="outlined-adornment-password"
+                                type={showPassword ? 'text' : 'password'}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={handleClickShowPassword}
+                                            // onMouseDown={handleMouseDownPassword}
+                                            edge="end"
+                                        >
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
+                                label="Password"
+                            />
+                        </FormControl> */}
+                        <Grid container sx={{ mb: 3 }}>
+                            <Grid item sm='6'>
+                                <Typography fontSize="0.8rem">
+                                    Remember me
+                                </Typography>
+                            </Grid>
+                            <Grid item sm='6'>
+                                <Typography fontSize="0.8rem">
+                                Forgot My password
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                        <Button onClick={handleSubmit(onSave)}
+                         variant="contained" size="medium" sx={{ width: "100%" }} color='secondary'>
+                            Login
+                        </Button>
+                        <Divider />
+                        <Button variant='subtitle1'>
+                            Don't have an account?
+                        </Button>
+                    </Grid>
                 </Grid>
-                <Grid item xs={12} md={6} lg={3} xl={1}>
-                    <h2>xs=8</h2>
-                </Grid>
-            </Grid> 
-        </Box>
-        
-    )
- }
+            </Grid>
+        </Grid>
 
- export default Login;
+    )
+
+}
+export default Login;
